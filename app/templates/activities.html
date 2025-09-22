@@ -1,0 +1,70 @@
+{# app/templates/activities.html #}
+{% extends "layout.html" %}
+{% block title %}Activities{% endblock %}
+{% block content %}
+<div class="container">
+  <h1>Activities — {{ today.strftime('%Y-%m-%d') }}</h1>
+
+  <section style="margin-bottom:1rem;">
+    <h2>Log manual activity / fitness summary</h2>
+    <form action="{{ url_for('activities.add_activity') }}" method="post" style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+      <input name="activity_type" placeholder="Activity (e.g. Running)" style="min-width:200px; padding:0.35rem;">
+      <input name="duration_minutes" type="number" step="0.1" placeholder="duration (min) optional" style="width:160px; padding:0.35rem;">
+      <input name="calories_burned" type="number" step="0.1" placeholder="activity calories (optional)" style="width:160px; padding:0.35rem;">
+      <input name="avg_bpm" type="number" step="1" placeholder="avg bpm (optional)" style="width:140px; padding:0.35rem;">
+      <input name="sleep_hours" type="number" step="0.1" placeholder="sleep hours (optional)" style="width:140px; padding:0.35rem;">
+      <input name="notes" placeholder="notes (optional)" style="min-width:200px; padding:0.35rem;">
+      <button type="submit" style="padding:0.4rem 0.8rem;">Add</button>
+    </form>
+    <p style="margin-top:0.5rem; color:#666;">
+      You can submit activity, an avg heart rate (bpm), and/or sleep hours. These are recorded and used to compute lifestyle points for the day.
+    </p>
+  </section>
+
+  <section style="margin-bottom:1rem;">
+    <h3>Today's lifestyle points: {{ today_points or 0 }}</h3>
+  </section>
+
+  <section>
+    <h2>Today's manual activities</h2>
+    {% if activities %}
+      <table style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr style="text-align:left; border-bottom:1px solid #ddd;">
+            <th style="padding:0.5rem;">Time</th>
+            <th style="padding:0.5rem;">Activity</th>
+            <th style="padding:0.5rem;">Duration (min)</th>
+            <th style="padding:0.5rem;">Calories</th>
+            <th style="padding:0.5rem;">Notes</th>
+            <th style="padding:0.5rem;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in activities %}
+          <tr style="border-bottom:1px solid #f0f0f0;">
+            <td style="padding:0.5rem;">{{ a.time.strftime("%H:%M") if a.time else "-" }}</td>
+            <td style="padding:0.5rem;">{{ a.activity_type }}</td>
+            <td style="padding:0.5rem;">{{ a.duration_minutes if a.duration_minutes is not none else "-" }}</td>
+            <td style="padding:0.5rem;">{{ a.calories_burned if a.calories_burned is not none else "-" }}</td>
+            <td style="padding:0.5rem;">{{ a.notes or "-" }}</td>
+            <td style="padding:0.5rem;">
+              <form action="{{ url_for('activities.delete_activity', activity_id=a.id) }}" method="post" style="display:inline">
+                <button type="submit" onclick="return confirm('Delete activity?')">Delete</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div style="margin-top:0.75rem;">
+        <strong>Manual calories burned today:</strong> {{ manual_burn|default(0) }}
+        {% if fit_burn %}
+          <br><small>Google Fit calories (if any): {{ fit_burn }}</small>
+        {% endif %}
+      </div>
+    {% else %}
+      <p>No manual activities logged today.</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

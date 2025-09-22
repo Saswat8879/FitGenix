@@ -1,0 +1,23 @@
+{# app/templates/auth/login.html #}
+{% extends "layout.html" %}
+{% block title %}Sign in — FitGenix{% endblock %}
+
+{% block content %}
+<div class="card narrow">
+  <h2>Sign in</h2>
+  <form method="post" action="{{ url_for('auth.login') }}" autocomplete="off">
+    <div class="mb-2">
+      <label>Email</label>
+      <input class="form-control" name="email" type="email" required>
+    </div>
+    <div class="mb-2">
+      <label>Password</label>
+      <input class="form-control" name="password" type="password" required>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:8px;">
+      <button class="btn btn-primary" type="submit">Sign in</button>
+      <a class="ghost" href="{{ url_for('auth.register') }}">New here? Register</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

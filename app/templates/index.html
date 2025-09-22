@@ -1,0 +1,35 @@
+{# app/templates/index.html #}
+{% extends "layout.html" %}
+{% block title %}Welcome — FitGenix{% endblock %}
+
+{% block content %}
+<section class="hero card">
+  <div class="hero-left">
+    <h1>FitGenix</h1>
+    <p class="lead">Personal meal & activity logging with insightful lifestyle points and optional Google Fit sync.</p>
+
+    {% if not user %}
+      <div class="hero-actions">
+        <a class="btn btn-primary large" href="{{ url_for('auth.register') }}">Get started — Register</a>
+        <a class="btn ghost large" href="{{ url_for('auth.login') }}">Already have an account? Log in</a>
+      </div>
+    {% else %}
+      <div class="hero-actions">
+        <a class="btn btn-primary large" href="{{ url_for('index') }}">Go to dashboard</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="hero-right">
+    <div class="card mini">
+      <h3>Why FitGenix?</h3>
+      <ul>
+        <li>Personal meal logging (calories & macros)</li>
+        <li>Activity tracking & visual insights</li>
+        <li>Lifestyle points combining activity, sleep & nutrition</li>
+        <li>Optional Google Fit integration</li>
+      </ul>
+    </div>
+  </div>
+</section>
+{% endblock %}
