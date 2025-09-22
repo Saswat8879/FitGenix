@@ -1,0 +1,73 @@
+{# app/templates/meals.html #}
+{% extends "layout.html" %}
+
+{% block title %}Meals{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1>Meals — {{ today.strftime('%Y-%m-%d') }}</h1>
+
+  <div class="dashboard-cards" style="display:flex; gap:1rem; margin-bottom:1rem;">
+    <div class="card p-2">
+      <div><strong>Target</strong></div>
+      <div style="font-size:1.25rem;">{{ target if target is not none else '—' }}</div>
+    </div>
+    <div class="card p-2">
+      <div><strong>Consumed</strong></div>
+      <div style="font-size:1.25rem;">{{ consumed if consumed is not none else 0 }}</div>
+    </div>
+    <div class="card p-2">
+      <div><strong>Remaining</strong></div>
+      <div style="font-size:1.25rem;">{{ remaining if remaining is not none else '—' }}</div>
+    </div>
+    <div class="card p-2">
+      <div><strong>Excess</strong></div>
+      <div style="font-size:1.25rem;">{{ excess if excess is not none else 0 }}</div>
+    </div>
+  </div>
+
+  <section style="margin-bottom:1.5rem;">
+    <h2>Add Meal</h2>
+    <form action="{{ url_for('meals.add_meal') }}" method="post" style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+      <input type="text" name="name" placeholder="e.g. 1 apple, 200g chicken" required style="min-width:220px; padding:0.35rem;">
+      <input type="number" step="0.1" name="calories" placeholder="calories (optional)" style="width:140px; padding:0.35rem;">
+      <button type="submit" style="padding:0.4rem 0.8rem;">Add</button>
+    </form>
+    <p style="margin-top:0.5rem; color:#666;">Meals will be timestamped automatically using the server's current date & time. Calories are automatically looked up (CalorieNinjas) if available; you can optionally enter a fallback value.</p>
+  </section>
+
+  <section>
+    <h2>Today's meals</h2>
+    {% if meals %}
+      <table style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr style="text-align:left; border-bottom:1px solid #ddd;">
+            <th style="padding:0.5rem;">Time</th>
+            <th style="padding:0.5rem;">Name</th>
+            <th style="padding:0.5rem;">Calories</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in meals %}
+            <tr style="border-bottom:1px solid #f0f0f0;">
+              <td style="padding:0.5rem;">
+                {% if m.time %}
+                  {{ m.time.strftime("%H:%M") }}
+                {% elif m.logged_at %}
+                  {{ m.logged_at.strftime("%H:%M") }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td style="padding:0.5rem;">{{ m.name }}</td>
+              <td style="padding:0.5rem;">{{ (m.calories or m.kcal) | int }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No meals logged today.</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

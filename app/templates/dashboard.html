@@ -1,0 +1,38 @@
+{# app/templates/dashboard.html #}
+{% extends "layout.html" %}
+{% block title %}Dashboard — FitGenix{% endblock %}
+
+{% block content %}
+<h2>Dashboard</h2>
+
+<div class="grid">
+  <a class="card link-card" href="{{ url_for('meals.index') }}" data-internal>
+    <h3>Meal logger</h3>
+    <p class="small muted">Log meals, calories and macros. Visual summaries below.</p>
+    <div class="card-foot">
+      <span>Go to Meal Logger</span>
+    </div>
+  </a>
+
+  <a class="card link-card" href="{{ url_for('activities.index') }}" data-internal>
+    <h3>Activity logger</h3>
+    <p class="small muted">Track workouts & steps. Connect to Google Fit for automatic import.</p>
+    <div class="card-foot">
+      <span>Go to Activity Logger</span>
+    </div>
+  </a>
+
+  <a class="card link-card" href="{{ url_for('profile.profile') }}" data-internal>
+    <h3>Lifestyle points</h3>
+    <p class="small muted">See your lifestyle points and trends calculated from your data.</p>
+    <div class="card-foot">
+      <span>View Lifestyle Points</span>
+    </div>
+  </a>
+</div>
+
+<section class="card mt">
+  <h3>Quick snapshot</h3>
+  <div class="chart-placeholder" style="min-height:160px;"></div>
+</section>
+{% endblock %}
