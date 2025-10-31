@@ -4,13 +4,11 @@ import os
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError
 
-# Ensure project root is on sys.path so "import app" works even if script is run directly
 THIS_FILE = os.path.abspath(__file__)
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(THIS_FILE), ".."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-# Now imports from your app should work
 try:
     from app import create_app
     from app.extensions import db
@@ -21,7 +19,6 @@ except Exception as e:
     print("Error:", e)
     sys.exit(1)
 
-
 def column_exists(engine, table_name, col_name):
     try:
         res = engine.execute(text(f"PRAGMA table_info({table_name});")).fetchall()
@@ -30,7 +27,6 @@ def column_exists(engine, table_name, col_name):
     except Exception as exc:
         print("Error checking columns:", exc)
         return False
-
 
 def add_column_sqlite(engine, table_name, col_def_sql):
     try:
@@ -42,7 +38,6 @@ def add_column_sqlite(engine, table_name, col_def_sql):
     except Exception as e:
         print("Error adding column:", e)
         return False
-
 
 def populate_targets(app, session):
     users = session.query(User).all()
@@ -69,7 +64,6 @@ def populate_targets(app, session):
         session.rollback()
     print(f"Updated target_calories for {updated} users.")
 
-
 def main():
     app = create_app()
     with app.app_context():
@@ -83,7 +77,7 @@ def main():
                 print("Failed to add column automatically. You may need to add it manually via sqlite cli.")
                 sys.exit(1)
             print("Column added successfully.")
-        # populate existing rows with computed targets
+        
         populate_targets(app, db.session)
         print("Done.")
 
