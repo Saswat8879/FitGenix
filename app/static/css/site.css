@@ -1,23 +1,72 @@
-/* app/static/css/site.css — refreshed color grading and polish */
+/* app/static/css/site.css — Refreshed with Glassmorphism UI */
 :root{
-  --bg-1: #071228;
-  --bg-2: #0d1530;
-  --panel: rgba(255,255,255,0.04);
-  --muted: #9fb0c4;
+  /* New Color Palette */
+  --bg-1: #0D0B1A;
+  --bg-2: #1A172D;
+  --panel: rgba(255, 255, 255, 0.04);
+  --muted: #aab9cf;
+  --text-color: #f0f6fc;
   --accent-start: #7ee6c7;
   --accent-end: #5fb4ff;
-  --glass: rgba(255,255,255,0.03);
+  
+  /* Glass Effect Variables */
+  --glass-bg: rgba(26, 23, 45, 0.4); /* Semi-transparent card bg */
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: 12px;
   --card-radius: 14px;
 }
 
 *{box-sizing:border-box}
-html,body{height:100%;margin:0}
+html,body{height:100%;margin:0;overflow-x:hidden;} /* Added overflow-x */
 body{
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  background: linear-gradient(180deg,var(--bg-1) 0%, var(--bg-2) 60%);
-  color: #e7f2fb;
+  background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 60%);
+  color: var(--text-color);
   -webkit-font-smoothing:antialiased;
+  position: relative; /* Needed for background orbs */
 }
+
+/* --- New Decorative Background Orbs --- */
+body::before,
+body::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  filter: blur(100px);
+  opacity: 0.3;
+  border-radius: 50%;
+}
+
+/* Top-left orb */
+body::before {
+  width: 350px;
+  height: 350px;
+  background: var(--accent-end);
+  top: -100px;
+  left: -100px;
+  animation: floatOrb1 15s infinite ease-in-out;
+}
+
+/* Bottom-right orb */
+body::after {
+  width: 400px;
+  height: 400px;
+  background: var(--accent-start);
+  bottom: -150px;
+  right: -150px;
+  animation: floatOrb2 18s infinite ease-in-out;
+}
+
+@keyframes floatOrb1 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(40px, 30px); }
+}
+@keyframes floatOrb2 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-30px, -40px); }
+}
+/* --- End Background Orbs --- */
+
 
 .container{max-width:1100px;margin:28px auto;padding:18px}
 
@@ -27,16 +76,26 @@ body{
   justify-content:space-between;
   gap:16px;
   padding:18px 24px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border-bottom: 1px solid rgba(255,255,255,0.03);
+  /* Glass effect for header */
+  background: rgba(13, 11, 26, 0.6);
+  border-bottom: 1px solid var(--glass-border);
   position:sticky; top:0; z-index:40;
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 
 .brand{font-weight:800;font-size:20px;color:#fff;text-decoration:none}
 .main-nav{display:flex;gap:12px;margin-left:12px}
 .main-nav a{color:var(--muted);text-decoration:none;padding:8px;border-radius:10px;transition:all 180ms}
-.main-nav a:hover{color:#fff;background:linear-gradient(90deg,var(--accent-start),var(--accent-end));transform:translateY(-2px)}
+.main-nav a:hover,
+.main-nav a.active-link { /* You can add .active-link via JS if you want */
+  color:#fff;
+  background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transform: translateY(-2px);
+}
 
 .left{display:flex;align-items:center;gap:18px}
 .right{display:flex;align-items:center;gap:12px}
@@ -51,23 +110,60 @@ body{
 .auth-btn{padding:8px 10px;border-radius:10px;text-decoration:none;color:#fff;background:linear-gradient(90deg,var(--accent-start),var(--accent-end))}
 .auth-btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--muted)}
 
-/* Cards */
-.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:var(--card-radius);padding:18px;color:inherit;box-shadow: 0 10px 40px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
+/* --- Glass Card Styles --- */
+.card{
+  background: var(--glass-bg);
+  border-radius: var(--card-radius);
+  padding: 18px;
+  color: inherit;
+  box-shadow: 0 10px 40px rgba(2, 6, 23, 0.4);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
 .card.mini{padding:12px}
 .card.narrow{max-width:520px;margin:18px auto}
 .lead{color:var(--muted);margin:8px 0 16px 0}
 
 /* grid */
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
-.link-card{text-decoration:none;color:inherit;display:flex;flex-direction:column;justify-content:space-between;min-height:120px}
-.link-card:hover{transform:translateY(-6px);transition:all 220ms;box-shadow:0 18px 50px rgba(7,18,40,0.6)}
+.link-card{
+  text-decoration:none;
+  color:inherit;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  min-height:120px;
+  transition: all 220ms;
+}
+.link-card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 18px 50px rgba(7,18,40,0.6);
+  border-color: rgba(255, 255, 255, 0.15);
+}
 
 /* forms & small types */
-.form-control{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+.form-control{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border: 1px solid var(--glass-border);
+  background: rgba(0,0,0,0.1); /* Darker transparent input */
+  color: inherit;
+  transition: all 180ms;
+}
+.form-control:focus {
+  outline: none;
+  border-color: var(--accent-start);
+  box-shadow: 0 0 0 2px var(--accent-end);
+}
+
 .mb-2{margin-bottom:12px}
-.btn{display:inline-block;padding:10px 14px;border-radius:10px;border:0;cursor:pointer;text-decoration:none}
+.btn{display:inline-block;padding:10px 14px;border-radius:10px;border:0;cursor:pointer;text-decoration:none;transition: all 180ms;}
 .btn-primary{background:linear-gradient(90deg,var(--accent-start),var(--accent-end));color:#07213a;font-weight:700}
-.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+.btn-primary:hover { transform: scale(1.05); box-shadow: 0 4px 20px rgba(95, 180, 255, 0.2); }
+.btn.ghost{background:transparent;border:1px solid var(--glass-border);color:var(--muted)}
+.btn.ghost:hover { background: var(--panel); color: var(--text-color); }
 .large{padding:12px 18px;font-size:16px}
 
 /* flashes */
@@ -96,6 +192,7 @@ body{
 .mt{margin-top:14px}
 
 /* --- dashboard1 center page styles --- */
+/* This style was in your original file for router.js */
 .center-dashboard{
   display:flex;
   align-items:center;
@@ -109,7 +206,11 @@ body{
   width:100%;
   padding:28px;
   border-radius:14px;
-  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  /* Apply glass to this card too */
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   box-shadow:0 18px 50px rgba(2,6,23,0.6);
 }
 .center-card h1{margin:0 0 6px 0;font-size:34px}
@@ -128,3 +229,76 @@ body{
 }
 .big-btn:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(32,56,85,0.22)}
 
+/* --- My suggested additions from previous request --- */
+/* (You can add these if you haven't already) */
+
+/* Layout for dashboard summary cards */
+.dashboard-cards {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap; /* Added for responsiveness */
+}
+
+/* Base styles for tables */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+.data-table th,
+.data-table td {
+  padding: 0.75rem 0.5rem; /* Increased padding */
+  text-align: left;
+}
+.data-table thead tr {
+  border-bottom: 1px solid var(--glass-border);
+}
+.data-table tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Responsive wrapper for tables */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Styles for forms like 'add meal' */
+.add-form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.add-form input[type="text"],
+.add-form input[type="number"],
+.add-form input[type="search"] {
+  padding: 0.45rem;
+  border-radius: 6px;
+  border: 1px solid var(--glass-border);
+  background: rgba(0,0,0,0.1);
+  color: inherit;
+  font-size: 14px;
+}
+.add-form input[type="text"] {
+  min-width: 220px;
+}
+.add-form input[type="number"] {
+  width: 140px;
+}
+
+.add-form button {
+  padding: 0.45rem 0.8rem;
+  border: 0;
+  border-radius: 6px;
+  background: var(--accent-start);
+  color: var(--bg-1);
+  font-weight: 600;
+  cursor: pointer;
+}
+.add-form button:hover {
+  filter: brightness(1.1);
+}
