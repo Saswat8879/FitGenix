@@ -19,7 +19,7 @@ CALORIE_NINJAS_KEY = os.environ.get("CALORIE_NINJAS_KEY") or os.environ.get("CAL
 CALORIE_NINJAS_URL = "https://api.calorieninjas.com/v1/nutrition"
 
 def lookup_calories_calorieninjas(query):
-    """Query CalorieNinjas for calories. Return float or None."""
+    """Query CalorieNinjas. Return dict of nutrients or None."""
     if not CALORIE_NINJAS_KEY:
         current_app.logger.debug("CALORIE_NINJAS_KEY not set; skipping lookup")
         return None
@@ -36,20 +36,30 @@ def lookup_calories_calorieninjas(query):
         items = data.get("items") or []
         if not items:
             return None
+        
+        # Sum nutrients from all items
+        total_calories = 0.0
+        total_protein = 0.0
+        total_carbs = 0.0
+        total_fat = 0.0
+
         for item in items:
-            c = item.get("calories")
-            if c is not None:
-                try:
-                    return float(c)
-                except Exception:
-                    continue
-        first = items[0]
-        if "calories" in first:
-            try:
-                return float(first["calories"])
-            except Exception:
-                pass
-        return None
+            total_calories += float(item.get("calories", 0.0) or 0.0)
+            total_protein += float(item.get("protein_g", 0.0) or 0.0)
+            # Note: API uses 'carbohydrates_total_g' and 'fat_total_g'
+            total_carbs += float(item.get("carbohydrates_total_g", 0.0) or 0.0)
+            total_fat += float(item.get("fat_total_g", 0.0) or 0.0)
+
+        if total_calories > 0:
+            return {
+                "calories": total_calories,
+                "protein": total_protein,
+                "carbs": total_carbs,
+                "fat": total_fat
+            }
+        else:
+            return None # No calories found
+            
     except Exception:
         current_app.logger.exception("CalorieNinjas lookup failed")
         return None
@@ -75,11 +85,17 @@ def index():
         meals = Meal.query.filter_by(user_id=user.id, date=today).all()
 
     consumed = 0.0
+    total_protein = 0.0
+    total_carbs = 0.0
+    total_fat = 0.0
     for m in meals:
         try:
             consumed += float(getattr(m, "calories", None) or getattr(m, "kcal", 0.0) or 0.0)
+            total_protein += float(m.protein_g or 0.0)
+            total_carbs += float(m.carbs_g or 0.0)
+            total_fat += float(m.fat_g or 0.0)
         except Exception:
-            current_app.logger.debug("Failed to parse meal calories for id=%s", getattr(m, "id", None))
+            current_app.logger.debug("Failed to parse meal nutrients for id=%s", getattr(m, "id", None))
 
     fd = FitnessData.query.filter_by(user_id=user.id, date=today).first()
     activity_burned = fd.calories_burned if fd else 0.0
@@ -111,6 +127,10 @@ def index():
         "consumed": int(round(consumed_val)),
         "excess": int(round(excess)),
         "remaining": (int(round(remaining)) if remaining is not None else None),
+        # Add new macro totals
+        "consumed_protein": int(round(total_protein)),
+        "consumed_carbs": int(round(total_carbs)),
+        "consumed_fat": int(round(total_fat)),
     }
 
     if isinstance(targets, dict):
@@ -125,6 +145,10 @@ def index():
     consumed_val = targets_payload.get("consumed")
     remaining_val = targets_payload.get("remaining")
     excess_val = targets_payload.get("excess")
+    # Get new macro values
+    consumed_protein = targets_payload.get("consumed_protein")
+    consumed_carbs = targets_payload.get("consumed_carbs")
+    consumed_fat = targets_payload.get("consumed_fat")
 
     return render_template(
         "meals.html",
@@ -136,7 +160,11 @@ def index():
         target=target,
         consumed=consumed_val,
         remaining=remaining_val,
-        excess=excess_val
+        excess=excess_val,
+        # Pass new values to template
+        consumed_protein=consumed_protein,
+        consumed_carbs=consumed_carbs,
+        consumed_fat=consumed_fat
     )
 
 @meals_bp.route("/add", methods=["POST"])
@@ -150,24 +178,38 @@ def add_meal():
         flash("Please provide a meal name (e.g. '1 apple').", "warning")
         return redirect(url_for("meals.index"))
     meal_date, meal_time = _server_now()
-    calories = None
+    
+    calories = 0.0
+    protein = None # Will default to 0.0 in DB
+    carbs = None
+    fat = None
+
     try:
-        calories = lookup_calories_calorieninjas(name)
+        nutrition_data = lookup_calories_calorieninjas(name)
     except Exception:
         current_app.logger.exception("CalorieNinjas lookup raised (non-fatal)")
-    if calories is None:
+        nutrition_data = None
+
+    if nutrition_data:
+        calories = nutrition_data.get("calories", 0.0)
+        protein = nutrition_data.get("protein", 0.0)
+        carbs = nutrition_data.get("carbs", 0.0)
+        fat = nutrition_data.get("fat", 0.0)
+    else:
+        # Fallback to manual calories if API fails or returns nothing
         try:
             calories = float(incoming.get("calories") or incoming.get("kcal") or 0.0)
         except Exception:
             calories = 0.0
+        # protein, carbs, fat remain None (will be 0.0 by db default)
 
     meal = Meal(
         user_id=user.id,
         name=name,
         calories=calories,
-        protein_g=None,
-        carbs_g=None,
-        fat_g=None,
+        protein_g=protein,
+        carbs_g=carbs,
+        fat_g=fat,
         date=meal_date,
         time=meal_time
     )
