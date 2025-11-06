@@ -6,8 +6,10 @@
   --panel: rgba(255, 255, 255, 0.04);
   --muted: #aab9cf;
   --text-color: #f0f6fc;
-  --accent-start: #7ee6c7;
-  --accent-end: #5fb4ff;
+  
+  /* UPDATED ACCENT COLORS */
+  --accent-start: #D9EBFF;  /* Lighter Blue (80% lightness) */
+  --accent-end: #C4E0FF;    /* Light Blue (75% lightness) */
   
   /* Glass Effect Variables */
   --glass-bg: rgba(26, 23, 45, 0.4); /* Semi-transparent card bg */
@@ -37,7 +39,7 @@ body::after {
   border-radius: 50%;
 }
 
-/* Top-left orb */
+/* Top-left orb (Updated to new blue) */
 body::before {
   width: 350px;
   height: 350px;
@@ -47,7 +49,7 @@ body::before {
   animation: floatOrb1 15s infinite ease-in-out;
 }
 
-/* Bottom-right orb */
+/* Bottom-right orb (Updated to new blue) */
 body::after {
   width: 400px;
   height: 400px;
@@ -101,14 +103,16 @@ body::after {
 .right{display:flex;align-items:center;gap:12px}
 
 .fit-indicator{font-size:13px;padding:8px 10px;border-radius:10px;background:var(--panel);color:var(--muted)}
-.fit-indicator.connected{background:linear-gradient(90deg,var(--accent-start),var(--accent-end));color:#07213a;font-weight:700}
+/* Updated connected button text color for better contrast */
+.fit-indicator.connected{background:linear-gradient(90deg,var(--accent-start),var(--accent-end));color:#0D0B1A;font-weight:700}
 
 .user-pill{padding:8px 12px;border-radius:12px;background:rgba(255,255,255,0.02);text-decoration:none;color:#fff}
 .signout{padding:8px 12px;border-radius:12px;background:transparent;text-decoration:none;color:var(--muted)}
 .signout:hover{color:#fff;background:rgba(255,255,255,0.02)}
 
-.auth-btn{padding:8px 10px;border-radius:10px;text-decoration:none;color:#fff;background:linear-gradient(90deg,var(--accent-start),var(--accent-end))}
-.auth-btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--muted)}
+/* Updated auth button text color for better contrast */
+.auth-btn{padding:8px 10px;border-radius:10px;text-decoration:none;color:#0D0B1A; font-weight: 600; background:linear-gradient(90deg,var(--accent-start),var(--accent-end))}
+.auth-btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--muted); font-weight: 400;}
 
 /* --- Glass Card Styles --- */
 .card{
@@ -160,8 +164,9 @@ body::after {
 
 .mb-2{margin-bottom:12px}
 .btn{display:inline-block;padding:10px 14px;border-radius:10px;border:0;cursor:pointer;text-decoration:none;transition: all 180ms;}
-.btn-primary{background:linear-gradient(90deg,var(--accent-start),var(--accent-end));color:#07213a;font-weight:700}
-.btn-primary:hover { transform: scale(1.05); box-shadow: 0 4px 20px rgba(95, 180, 255, 0.2); }
+/* Updated primary button text color */
+.btn-primary{background:linear-gradient(90deg,var(--accent-start),var(--accent-end));color:#0D0B1A;font-weight:700}
+.btn-primary:hover { transform: scale(1.05); box-shadow: 0 4px 20px rgba(196, 224, 255, 0.2); }
 .btn.ghost{background:transparent;border:1px solid var(--glass-border);color:var(--muted)}
 .btn.ghost:hover { background: var(--panel); color: var(--text-color); }
 .large{padding:12px 18px;font-size:16px}
@@ -224,10 +229,10 @@ body::after {
   text-decoration:none;
   font-weight:700;
   background:linear-gradient(90deg,var(--accent-start),var(--accent-end));
-  color:#07213a;
+  color:#0D0B1A; /* Updated text color */
   transition:transform .18s ease, box-shadow .18s ease;
 }
-.big-btn:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(32,56,85,0.22)}
+.big-btn:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(196, 224, 255, 0.22)}
 
 /* --- My suggested additions from previous request --- */
 /* (You can add these if you haven't already) */
