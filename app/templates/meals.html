@@ -7,22 +7,34 @@
 <div class="container">
   <h1>Meals — {{ today.strftime('%Y-%m-%d') }}</h1>
 
-  <div class="dashboard-cards" style="display:flex; gap:1rem; margin-bottom:1rem;">
+  <div class="dashboard-cards" style="display:flex; gap:1rem; margin-bottom:1rem; flex-wrap:wrap;">
     <div class="card p-2">
-      <div><strong>Target</strong></div>
+      <div><strong>Target Cals</strong></div>
       <div style="font-size:1.25rem;">{{ target if target is not none else '—' }}</div>
     </div>
     <div class="card p-2">
-      <div><strong>Consumed</strong></div>
+      <div><strong>Consumed Cals</strong></div>
       <div style="font-size:1.25rem;">{{ consumed if consumed is not none else 0 }}</div>
     </div>
     <div class="card p-2">
-      <div><strong>Remaining</strong></div>
+      <div><strong>Remaining Cals</strong></div>
       <div style="font-size:1.25rem;">{{ remaining if remaining is not none else '—' }}</div>
     </div>
     <div class="card p-2">
-      <div><strong>Excess</strong></div>
+      <div><strong>Excess Cals</strong></div>
       <div style="font-size:1.25rem;">{{ excess if excess is not none else 0 }}</div>
+    </div>
+    <div class="card p-2">
+      <div><strong>Protein (g)</strong></div>
+      <div style="font-size:1.25rem;">{{ consumed_protein | int }}</div>
+    </div>
+    <div class="card p-2">
+      <div><strong>Carbs (g)</strong></div>
+      <div style="font-size:1.25rem;">{{ consumed_carbs | int }}</div>
+    </div>
+    <div class="card p-2">
+      <div><strong>Fat (g)</strong></div>
+      <div style="font-size:1.25rem;">{{ consumed_fat | int }}</div>
     </div>
   </div>
 
@@ -30,10 +42,10 @@
     <h2>Add Meal</h2>
     <form action="{{ url_for('meals.add_meal') }}" method="post" style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
       <input type="text" name="name" placeholder="e.g. 1 apple, 200g chicken" required style="min-width:220px; padding:0.35rem;">
-      <input type="number" step="0.1" name="calories" placeholder="calories (optional)" style="width:140px; padding:0.35rem;">
+      <input type="number" step="0.1" name="calories" placeholder="calories (fallback)" style="width:140px; padding:0.35rem;">
       <button type="submit" style="padding:0.4rem 0.8rem;">Add</button>
     </form>
-    <p style="margin-top:0.5rem; color:#666;">Meals will be timestamped automatically using the server's current date & time. Calories are automatically looked up (CalorieNinjas) if available; you can optionally enter a fallback value.</p>
+    <p style="margin-top:0.5rem; color:#666;">Nutrients are automatically looked up. You can enter calories as a fallback if lookup fails.</p>
   </section>
 
   <section>
@@ -45,6 +57,9 @@
             <th style="padding:0.5rem;">Time</th>
             <th style="padding:0.5rem;">Name</th>
             <th style="padding:0.5rem;">Calories</th>
+            <th style="padding:0.5rem;">Protein (g)</th>
+            <th style="padding:0.5rem;">Carbs (g)</th>
+            <th style="padding:0.5rem;">Fat (g)</th>
           </tr>
         </thead>
         <tbody>
@@ -61,6 +76,9 @@
               </td>
               <td style="padding:0.5rem;">{{ m.name }}</td>
               <td style="padding:0.5rem;">{{ (m.calories or m.kcal) | int }}</td>
+              <td style="padding:0.5rem;">{{ m.protein_g | round(1) if m.protein_g is not none else '—' }}</td>
+              <td style="padding:0.5rem;">{{ m.carbs_g | round(1) if m.carbs_g is not none else '—' }}</td>
+              <td style="padding:0.5rem;">{{ m.fat_g | round(1) if m.fat_g is not none else '—' }}</td>
             </tr>
           {% endfor %}
         </tbody>
